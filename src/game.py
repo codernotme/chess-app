@@ -4,6 +4,7 @@ from config import Config
 from const import *
 from board import Board
 from dragger import Dragger
+from square import Square
 
 class Game:
 
@@ -22,6 +23,18 @@ class Game:
                 color = theme.bg.light if (r+c) % 2 == 0 else theme.bg.dark
                 rect = (c*sqsize, r*sqsize, sqsize, sqsize)
                 pygame.draw.rect(surface, color, rect)
+
+                #row coordinates
+                if c == 0:
+                    color = theme.bg.dark if r % 2 == 0 else theme.bg.light
+                    lbl = self.config.font.render(str(rows-r),1, color)
+                    lbl_pos = (5, 5+r * sqsize)
+                    surface.blit(lbl, lbl_pos)
+                if r == 7:
+                    color = theme.bg.dark if (r+c) % 2 == 0 else theme.bg.light
+                    lbl = self.config.font.render(Square.get_alphacol(c),1, color)
+                    lbl_pos = (c * sqsize + sqsize - 20, height - 20)
+                    surface.blit(lbl, lbl_pos)
 
     def show_pieces(self, surface):
         for r in range(rows):
@@ -76,7 +89,11 @@ class Game:
         self.next_player = 'black' if self.next_player == 'white' else 'white'
 
     def set_hover(self, row, col):
-        self.hovered_sqr = self.board.squares[row][col]
+        if 0 <= row < len(self.board.squares) and 0 <= col < len(self.board.squares[row]):
+            self.hovered_sqr = self.board.squares[row][col]
+        else:
+            self.hovered_sqr = None  # Reset hovered_sqr if the indices are out of range
+
 
     def change_theme(self):
         self.config.change_theme()
